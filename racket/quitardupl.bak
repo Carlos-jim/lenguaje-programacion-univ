@@ -1,7 +1,0 @@
-#lang racket
-
-(define (quitar-dupl palabra)
-  (list->string (remove-duplicates (string->list palabra))))
-
-; Prueba la función
-(quitar-dupl "aaaaaaaaaeeiiiiou")
