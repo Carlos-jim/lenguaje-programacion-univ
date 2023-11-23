@@ -1,0 +1,26 @@
+#lang racket
+
+(define (romano-a-arabico romano)
+  (define letras-romanas (string->list "IVXLCDM"))
+  (define valores '(1 5 10 50 100 500 1000))
+  
+  (define (valor letra)
+    (list-ref valores (index-of letras-romanas letra)))
+  
+  (define (procesar romano total valor-anterior)
+    (if (null? romano)
+        total
+        (let* ([letra (car romano)]
+               [valor-actual (valor letra)])
+          (if (>= valor-actual valor-anterior)
+              (procesar (cdr romano) (+ total valor-actual) valor-actual)
+              (procesar (cdr romano) (- total valor-actual) valor-actual)))))
+  
+  (procesar (reverse (string->list romano)) 0 0))
+
+(define (solicitar-romano)
+  (display "Introduzca el numero romano: ")
+  (let ([romano (read-line)])
+    (display (romano-a-arabico romano))))
+
+(solicitar-romano)  ; Solicita al usuario que introduzca un número romano y lo imprime en arábigo

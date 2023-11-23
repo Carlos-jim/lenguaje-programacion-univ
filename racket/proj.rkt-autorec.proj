@@ -1,0 +1,59 @@
+#lang racket
+
+(define (check-view line view)
+  (let loop ([line line] [count 0] [max-height 0])
+    (cond
+      [(empty? line) (equal? count view)]
+      [(> (first line) max-height)
+       (loop (rest line) (+ count 1) (first line))]
+      [else
+       (loop (rest line) count max-height)])))
+
+
+(define (check-all-views grid views)
+  (let* ([n (length grid)] ; Tamaño de la cuadrícula
+         [range (build-list n values)]) ; Lista de índices [0, 1, ..., n-1]
+    (andmap
+     (lambda (i)
+       (and
+        ;; Se comprueba la vista desde el norte y el sur para cada columna
+        (check-view (map (lambda (row) (list-ref row i)) grid) (list-ref (first views) i))
+        (check-view (reverse (map (lambda (row) (list-ref row i)) grid)) (list-ref (second views) i))
+        ;; Se comprueba la vista desde el oeste y el este para cada fila
+        (check-view (list-ref grid i) (list-ref (third views) i))
+        (check-view (reverse (list-ref grid i)) (list-ref (fourth views) i))))
+     range)))
+
+(define (solve grid views row col)
+  (let* ([n (length grid)]) ; Tamaño de la cuadrícula
+    (cond
+      [(= row n) ; Si se ha llegado al final de la cuadrícula
+       (if (check-all-views grid views) grid #f)] ; Se comprueba si la solución es válida
+      [(= col n) ; Si se ha llegado al final de una fila
+       (solve grid views (+ row 1) 0)] ; Se pasa a la siguiente fila
+      [else ; Si no se ha llegado al final de una fila
+       (let loop ([height 1]) ; Se prueban todas las alturas posibles
+         (cond
+           [(> height n) #f] ; Si no hay solución para esta casilla, se devuelve #f
+           [(and (not (member height (list-ref grid row))) ; Si la altura no está repetida en la fila
+                 (not (member height (map (lambda (row) (list-ref row col)) grid)))) ; y la altura no está repetida en la columna
+            (begin
+              (set! grid (list-set grid row (list-set (list-ref grid row) col height))) ; Se asigna la altura a la casilla
+              (let ([solution (solve grid views row (+ col 1))]) ; Se llama recursivamente a la función con la siguiente casilla
+                (if solution ; Si se ha encontrado una solución
+                    solution ; Se devuelve la solución
+                    (begin
+                      (set! grid (list-set grid row (list-set (list-ref grid row) col 0))) ; Si no se ha encontrado una solución, se deshace el cambio
+                      (loop (+ height 1))))))] ; Se prueba con la siguiente altura
+           [else
+            (loop (+ height 1))]))]))) ; Se prueba con la siguiente altura
+
+
+
+(define views '((3 1 2 2) (2 3 1 2) (2 2 1 3) (3 1 3 2))) ; Vistas
+(define n (length (first views))) ; Tamaño de la cuadrícula
+(define grid (make-list n (make-list n 0))) ; Matriz vacía de ceros
+
+;; Ejemplo de salida
+(define solution (solve grid views 0 0)) ; Se llama a la función para resolver el problema
+solution ; Se imprime la solución

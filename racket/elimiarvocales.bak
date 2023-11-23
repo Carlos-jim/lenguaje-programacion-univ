@@ -1,0 +1,13 @@
+#lang racket
+
+; Función para eliminar duplicados de una cadena
+(define (quitar-vocales lista)
+  (map (lambda (palabra) 
+         (list->string 
+          (filter (lambda (letra) 
+                    (not (member letra '(#\a #\e #\i #\o #\u #\A #\E #\I #\O #\U))))
+                  (string->list palabra))))
+       lista))
+
+; Prueba la función
+(quitar-vocales '("hola" "mundo" "cruel"))
