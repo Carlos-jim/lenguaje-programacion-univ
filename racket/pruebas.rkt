@@ -1,5 +1,4 @@
 #lang racket
-
 (define (is-valid board row col value N top bottom left right)
   (let* ([row-values (vector->list (list-ref board row))] ; Usa vector->list aquí
          [col-values (map (lambda (r) (vector-ref (list-ref board r) col)) (range N))]
@@ -46,29 +45,25 @@
                             (loop (+ value 1)))))
                     (loop (+ value 1))))))))
 
-
-(define N 4) ; Define N aquí
-
-
 (define (main)
-  ;(display "Enter the size of the board: ")
-   (let* ([board (for/list ([i N]) (make-vector N 0))])
-    
-    (display "Enter the clues from NORTH, separated by spaces: ")
-     (let* ([top (map string->number (string-split (read-line)))]
-           [top-len (length top)])
-       
-      (display "Enter the clues from SOUTH, separated by spaces: ")
-       (let* ([bottom (map string->number (string-split (read-line)))]
-           [bottom-len (length bottom)])
-        (display "Enter the clues from WEST, separated by spaces: ")
-         (let* ([left (map string->number (string-split (read-line)))]
-           [left-len (length left)])
-          (display "Enter the clues from EAST, separated by spaces: ")
-           (let* ([right (map string->number (string-split (read-line)))]
-           [right-len (length right)])
-            (if (and (= top-len N) (= bottom-len N) (= left-len N) (= right-len N))
-                (solve board 0 0 N top bottom left right)
-                (display "Invalid input. The number of clues must match the size of the board."))))))))
+  (display "Introduce las vistas del NORTE, SEPARADA POR ESPACIOS ")
+  (let* ([top (map string->number (string-split (read-line)))]
+         [N (length top)]) ; Usa la longitud de la lista como el tamaño de la tabla
+    (if (<= N 10)
+        (let* ([board (for/list ([i N]) (make-vector N 0))]) ; Crea el tablero usando una comprensión de lista
+          (display "Introduce las vistas del SUR, SEPARADA POR ESPACIOS ")
+          (let* ([bottom (map string->number (string-split (read-line)))]
+                 [bottom-len (length bottom)])
+            (display "Introduce las vistas del OESTE, SEPARADA POR ESPACIOS ")
+            (let* ([left (map string->number (string-split (read-line)))]
+                   [left-len (length left)])
+              (display "Introduce las vistas del ESTE, SEPARADA POR ESPACIOS ")
+              (let* ([right (map string->number (string-split (read-line)))]
+                     [right-len (length right)])
+                (if (and (= bottom-len N) (= left-len N) (= right-len N))
+                    (solve board 0 0 N top bottom left right) ; Pasa N como un argumento a la función solve
+                    (display "Entrada invalida. Introduzco mas vistas que el rango del tablero"))))))
+        (display "El tamaño de la tabla no puede exceder 10x10."))))
 
 (main)
+
